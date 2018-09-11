@@ -12,10 +12,8 @@ locally, and a provisioned Cloudant service when running on the cloud.
 
 Before we begin make sure the following are installed.
 
-1.  [Node.js](https://nodejs.org/en/download/) >= 8.9.0.
-2.  [LB4 CLI](https://www.npmjs.com/package/@loopback/cli) (`lb4` command).
-3.  [Cloud Foundy CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html).
-4.  [Docker](https://www.docker.com/).
+1.  [Cloud Foundy CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html).
+2.  [Docker](https://www.docker.com/).
 
 Consider the
 ["todo" example](https://github.com/strongloop/loopback-next/tree/master/examples/todo)
@@ -27,6 +25,26 @@ You can quickly clone the "todo" example app by running the command:
 ```sh
 $ lb4 example todo
 ```
+
+## Cloud setup
+
+### Database
+
+1.  Provision a Cloudant database service, and name it `myCloudant`.
+2.  Log on to the Cloudant Dashboard and create a database named `todo`.
+
+### Connecting the database to app
+
+Before we can use the provisioned database, we have to connect the database to
+an app on Cloud Foundry.
+
+So, create a
+[Node.js SDK app](https://console.bluemix.net/catalog/starters/sdk-for-nodejs)
+and connect it to the provisioned Cloudant service.
+
+Make a note of the name of the app. Let's say you named it `mylb4app`. We will
+be using this name as a placeholder for the unique name you will choose yourself
+eventually. Replace `mylb4app` with your app's name in all instances in the doc.
 
 ## Local setup
 
@@ -67,7 +85,7 @@ Update `db.datasource.json` to use the Cloudant connector.
 Install the `loopback-connector-cloudant` package.
 
 ```sh
-$ npm i loopback-connector-cloudant -s
+$ npm i loopback-connector-cloudant
 ```
 
 #### Updating npm script
@@ -81,7 +99,7 @@ We will use the `cfenv` module to simplify some of the Cloud Foundry related
 operations. Install `cfenv` in the project directory.
 
 ```sh
-$ npm i cfenv -s
+$ npm i cfenv
 ```
 
 Update the `index.ts` file to the following to enable service binding.
@@ -92,6 +110,7 @@ import {ApplicationConfig} from '@loopback/core';
 const datasourceDb = require('./datasources/db.datasource.json');
 const cfenv = require('cfenv');
 const appEnv = cfenv.getAppEnv();
+// If running on IBM Cloud, we get the Cloudant service details from VCAP_SERVICES
 if (!appEnv.isLocal) {
   // 'myCloudant' is the name of the provisioned Cloudant service
   datasourceDb = Object.assign({}, datasourceDb, {
@@ -117,26 +136,6 @@ export async function main(options?: ApplicationConfig) {
   return app;
 }
 ```
-
-## Cloud setup
-
-### Database
-
-1.  Provision a Cloudant database service, and name it `myCloudant`.
-2.  Log on to the Cloudant Dashboard and create a database named `todo`.
-
-### Connecting the database to app
-
-Before we can use the provisioned database, we have to connect the database to
-an app on Cloud Foundry.
-
-So, create a
-[Node.js SDK app](https://console.bluemix.net/catalog/starters/sdk-for-nodejs)
-and connect it to the provisioned Cloudant service.
-
-Make a note of the name of the app. Let's say you named it `mylb4app`. We will
-be using this name as a placeholder for the unique name you will choose yourself
-eventually. Replace `mylb4app` with your app's name in all instances in the doc.
 
 ## Deploying the app
 
