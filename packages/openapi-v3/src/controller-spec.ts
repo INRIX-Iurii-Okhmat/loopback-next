@@ -113,28 +113,24 @@ function resolveControllerSpec(constructor: Function): ControllerSpec {
     for (const code in operationSpec.responses) {
       for (const c in operationSpec.responses[code].content) {
         debug('  evaluating response code %s with content: %o', code, c);
-        const tsType = operationSpec.responses[code].content[c][TS_TYPE_KEY];
+        const content = operationSpec.responses[code].content[c];
+        const tsType = content[TS_TYPE_KEY];
         debug('  %s => %o', TS_TYPE_KEY, tsType);
         if (tsType) {
-          operationSpec.responses[code].content[c].schema = resolveSchema(
-            tsType,
-            operationSpec.responses[code].content[c].schema,
-          );
+          content.schema = resolveSchema(tsType, content.schema);
 
           // We don't want a Function type in the final spec.
-          delete operationSpec.responses[code].content[c][TS_TYPE_KEY];
+          delete content[TS_TYPE_KEY];
         }
 
-        if (operationSpec.responses[code].content[c].schema.type === 'array') {
-          operationSpec.responses[code].content[c].schema.items = resolveSchema(
-            operationSpec.responses[code].content[c].schema.items[TS_TYPE_KEY],
-            operationSpec.responses[code].content[c].schema.items,
+        if (content.schema.type === 'array') {
+          content.schema.items = resolveSchema(
+            content.schema.items[TS_TYPE_KEY],
+            content.schema.items,
           );
 
           // We don't want a Function type in the final spec.
-          delete operationSpec.responses[code].content[c].schema.items[
-            TS_TYPE_KEY
-          ];
+          delete content.schema.items[TS_TYPE_KEY];
         }
       }
     }
