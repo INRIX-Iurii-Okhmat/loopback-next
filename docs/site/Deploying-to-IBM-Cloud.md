@@ -102,7 +102,7 @@ operations. Install `cfenv` in the project directory.
 $ npm i cfenv
 ```
 
-Update the `index.ts` file to the following to enable service binding.
+Update the `src/index.ts` file to the following to enable service binding.
 
 ```ts
 import {TodoListApplication} from './application';
@@ -110,24 +110,25 @@ import {ApplicationConfig} from '@loopback/core';
 const datasourceDb = require('./datasources/db.datasource.json');
 const cfenv = require('cfenv');
 const appEnv = cfenv.getAppEnv();
-// If running on IBM Cloud, we get the Cloudant service details from VCAP_SERVICES
-if (!appEnv.isLocal) {
-  // 'myCloudant' is the name of the provisioned Cloudant service
-  datasourceDb = Object.assign({}, datasourceDb, {
-    url: appEnv.getServiceURL('myCloudant'),
-  });
-  app.bind('datasources.config.db').to(datasourceDb);
-}
 
 export async function main(options?: ApplicationConfig) {
-  // Set the port assigned for the app
-  if (!options) options = {};
-  if (!options.rest) options.rest = {};
-
-  if (appEnv.isLocal) options.rest.port = options.rest.port;
-  else options.rest.port = appEnv.port;
+  // Set the port assined for the app
+  if (!options) {
+    options = {rest: {port: appEnv.port}};
+  } else {
+    if (!options.rest) options.rest = {};
+    options.rest.port = appEnv.port || options.rest.port;
+  }
 
   const app = new TodoListApplication(options);
+  // If running on IBM Cloud, we get the Cloudant service details from VCAP_SERVICES
+  if (!appEnv.isLocal) {
+    // 'myCloudant' is the name of the provisioned Cloudant service
+    const updatedDatasourceDb = Object.assign({}, datasourceDb, {
+      url: appEnv.getServiceURL('myCloudant'),
+    });
+    app.bind('datasources.config.db').to(updatedDatasourceDb);
+  }
   await app.boot();
   await app.start();
 
@@ -167,7 +168,11 @@ npm start
 
 ### Cloud
 
-Before we can deploy to IBM Cloud, we need to create two artifacts.
+Authenticated to IBM Cloud using the `cf login` command before proceeding
+further.
+
+We'll need to create the following Cloud Foundry artifacts to deploy our app to
+IBM Cloud.
 
 1.  `.cfignore` - not mandatory, prevents `cf` from uploading the listed files
     to IBM Cloud.
@@ -183,7 +188,7 @@ vcap-local.js
 ```
 
 To create the `manifest.yml` file, run `cf create-app-manifest` and specify the
-name of the app that was created earlier `mylb4app`.
+name of the app that was created earlier, viz.: `mylb4app`.
 
 ```sh
 $ cf create-app-manifest mylb4app -p manifest.yml
