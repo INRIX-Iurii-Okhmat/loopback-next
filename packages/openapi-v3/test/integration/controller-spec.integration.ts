@@ -7,6 +7,7 @@ import {expect} from '@loopback/testlab';
 import {model, property} from '@loopback/repository';
 import {ParameterObject} from '@loopback/openapi-v3-types';
 import {param, requestBody, getControllerSpec, post, get} from '../../';
+import {hello} from '../../../boot/test/fixtures/multiple.artifact';
 
 describe('controller spec', () => {
   it('adds property schemas in components.schemas', () => {
@@ -167,6 +168,29 @@ describe('controller spec', () => {
     expect(spec.paths['/'].get.responses).to.eql({
       '200': {
         description: 'Return value of MyController.hello',
+      },
+    });
+  });
+
+  it('generates a response given no content property', () => {
+    class MyController {
+      @get('/', {
+        responses: {
+          '200': {
+            description: 'hello world',
+          },
+        },
+      })
+      hello() {
+        return 'hello world';
+      }
+    }
+
+    const spec = getControllerSpec(MyController);
+    expect(spec.paths['/'].get).to.have.property('responses');
+    expect(spec.paths['/'].get.responses).to.eql({
+      '200': {
+        description: 'hello world',
       },
     });
   });
