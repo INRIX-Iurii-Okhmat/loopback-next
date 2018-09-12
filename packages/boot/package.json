@@ -38,7 +38,6 @@
   },
   "devDependencies": {
     "@loopback/build": "^0.7.2",
-    "@loopback/openapi-v3": "^0.13.1",
     "@loopback/rest": "^0.21.0",
     "@loopback/testlab": "^0.12.1",
     "@types/node": "^10.1.1"

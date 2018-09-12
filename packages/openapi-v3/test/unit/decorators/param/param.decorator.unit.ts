@@ -24,7 +24,7 @@ describe('Routing metadata for parameters', () => {
       };
 
       class MyController {
-        @get('/greet', {responses: {'200': {description: ''}}})
+        @get('/greet')
         greet(@param(paramSpec) name: string) {}
       }
 
@@ -33,13 +33,14 @@ describe('Routing metadata for parameters', () => {
       const expectedSpec = anOperationSpec()
         .withOperationName('greet')
         .withParameter(paramSpec)
+        .withResponse(200, {description: 'Return value of MyController.greet'})
         .build();
       expect(actualSpec.paths['/greet']['get']).to.eql(expectedSpec);
     });
 
     it('infers ts primitive types', () => {
       class MyController {
-        @patch('/update/{id}', {responses: {'200': {description: ''}}})
+        @patch('/update/{id}')
         update(
           @param({
             name: 'id',
@@ -75,6 +76,7 @@ describe('Routing metadata for parameters', () => {
 
       const expectedSpec = anOperationSpec()
         .withOperationName('update')
+        .withResponse(200, {description: 'Return value of MyController.update'})
         .withParameter({
           name: 'id',
           schema: {
@@ -128,7 +130,7 @@ describe('Routing metadata for parameters', () => {
 
     it('infers array type without explicit type', () => {
       class MyController {
-        @get('/greet', {responses: {'200': {description: ''}}})
+        @get('/greet')
         greet(
           @param({
             name: 'names',
@@ -143,6 +145,7 @@ describe('Routing metadata for parameters', () => {
 
       const expectedSpec = anOperationSpec()
         .withOperationName('greet')
+        .withResponse(200, {description: 'Return value of MyController.greet'})
         .withParameter({
           name: 'names',
           schema: {
@@ -176,7 +179,7 @@ describe('Routing metadata for parameters', () => {
 
     it('infers array parameter type with `any`', () => {
       class MyController {
-        @get('/greet', {responses: {'200': {description: ''}}})
+        @get('/greet')
         greet(
           @param.array('names', 'query', {type: 'string'})
           names: /* tslint:disable-next-line:no-any */
@@ -188,6 +191,7 @@ describe('Routing metadata for parameters', () => {
 
       const expectedSpec = anOperationSpec()
         .withOperationName('greet')
+        .withResponse(200, {description: 'Return value of MyController.greet'})
         .withParameter({
           name: 'names',
           schema: {

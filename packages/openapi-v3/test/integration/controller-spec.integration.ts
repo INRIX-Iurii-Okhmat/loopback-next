@@ -7,7 +7,6 @@ import {expect} from '@loopback/testlab';
 import {model, property} from '@loopback/repository';
 import {ParameterObject} from '@loopback/openapi-v3-types';
 import {param, requestBody, getControllerSpec, post, get} from '../../';
-import {hello} from '../../../boot/test/fixtures/multiple.artifact';
 
 describe('controller spec', () => {
   it('adds property schemas in components.schemas', () => {
