@@ -120,7 +120,7 @@ export class OpenApiSpecBuilder extends BuilderBase<OpenApiSpec> {
 export class OperationSpecBuilder extends BuilderBase<OperationObject> {
   constructor() {
     super({
-      responses: {'200': {description: ''}},
+      responses: {'200': {description: 'An undocumented response body.'}},
     });
   }
 
